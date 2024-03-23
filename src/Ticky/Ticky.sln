@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticky", "Ticky.csproj", "{2224EE9F-944B-4671-9819-AA5A1A7FF312}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D5F4C2C-932A-4AEB-AFD2-5CCCC34DD86D}
+	EndGlobalSection
+EndGlobal
