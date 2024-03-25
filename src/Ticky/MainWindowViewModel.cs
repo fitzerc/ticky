@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Ticky.Core;
 
 namespace Ticky;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    private Stopwatch? _activeStopwatch = null;
-    private Timer? _activeTimer = null;
+    private TickyTimer? _timer;
 
     public string FooterText { get; private set; } = "Placeholder Text";
 
@@ -21,40 +20,66 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void Start()
     {
-        if (_activeStopwatch is not null && _activeStopwatch.IsRunning)
+        if (_timer is null)
         {
-            return;
-        }
+            TickyTimerSettings.Period = TimeSpan.FromSeconds(5);
+            _timer = new TickyTimer();
 
-        _activeStopwatch ??= new();
-        _activeStopwatch.Start();
-        StartTimer();
+            var startResult = _timer.Start(OnTick);
+            if (startResult.IsFailed)
+            {
+                //TODO: handle TimerStart error
+            }
+        }
+        else if (!_timer.IsRunning())
+        {
+            var unpauseResult = _timer.Unpause();
+            if (unpauseResult.IsFailed)
+            {
+                //TODO: handle TimerUnpause error
+            }
+        }
     }
 
-    private void StartTimer()
-        => _activeTimer ??= new Timer(_ => OnTick(_activeStopwatch.Elapsed), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(200));
-
-    private void OnTick(TimeSpan ts)
-        => Time = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
+    private void OnTick(TimeSpan? ts)
+    {
+        if (ts.HasValue)
+        {
+            Time = $"{ts.Value.Hours:00}:{ts.Value.Minutes:00}:{ts.Value.Seconds:00}";
+        }
+    }
 
     [RelayCommand]
     private void Pause()
     {
-        _activeStopwatch?.Stop();
-        ClearTimer();
+        if (_timer is null)
+        {
+            //TODO: handle pause _timer is null error
+            return;
+        }
+
+        var timerPauseResult = _timer.Pause();
+        if (timerPauseResult.IsFailed)
+        {
+            //TODO: handle TimerPause error
+        }
     }
 
     [RelayCommand]
     private void Stop()
     {
-        _activeStopwatch?.Stop();
-        _activeStopwatch = null;
-        ClearTimer();
-    }
+        if (_timer is null)
+        {
+            //TODO: handle stop _timer is null error
+            return;
+        }
 
-    private void ClearTimer()
-    {
-        _activeTimer?.Dispose();
-        _activeTimer = null;
+        var stopTimerResult = _timer.Stop();
+        if (stopTimerResult.IsFailed)
+        {
+            //TODO: handle StopTimer error
+        }
+
+        _timer = null;
     }
 }

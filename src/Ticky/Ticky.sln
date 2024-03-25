@@ -5,6 +5,10 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticky", "Ticky.csproj", "{2224EE9F-944B-4671-9819-AA5A1A7FF312}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticky.Core", "..\Ticky.Core\Ticky.Core.csproj", "{8324D047-847A-40AD-ACBE-9F9FD1C2DB01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ticky.Core.Tests", "..\Ticky.Core.Tests\Ticky.Core.Tests.csproj", "{F16DDC48-D5C9-48B4-B02F-1E2D52309561}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2224EE9F-944B-4671-9819-AA5A1A7FF312}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8324D047-847A-40AD-ACBE-9F9FD1C2DB01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8324D047-847A-40AD-ACBE-9F9FD1C2DB01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8324D047-847A-40AD-ACBE-9F9FD1C2DB01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8324D047-847A-40AD-ACBE-9F9FD1C2DB01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F16DDC48-D5C9-48B4-B02F-1E2D52309561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F16DDC48-D5C9-48B4-B02F-1E2D52309561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F16DDC48-D5C9-48B4-B02F-1E2D52309561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F16DDC48-D5C9-48B4-B02F-1E2D52309561}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
