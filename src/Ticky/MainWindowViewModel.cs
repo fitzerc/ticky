@@ -107,25 +107,25 @@ public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : Observab
     {
         var sb = new StringBuilder();
 
-        if (_enteredProject == "Project" || _enteredTask == "Task" || _enteredTag == "Tag")
+        if (EnteredProject == "Project" || EnteredTask == "Task" || EnteredTag == "Tag")
         {
             sb.Append("Project, task, or tag are default values.");
             sb.Append(Environment.NewLine);
         }
 
-        if (string.IsNullOrEmpty(_enteredProject))
+        if (string.IsNullOrEmpty(EnteredProject))
         {
             sb.Append("Project is empty.");
             sb.Append(Environment.NewLine);
         }
 
-        if (string.IsNullOrEmpty(_enteredTask))
+        if (string.IsNullOrEmpty(EnteredTask))
         {
             sb.Append("Task is empty.");
             sb.Append(Environment.NewLine);
         }
 
-        if (string.IsNullOrEmpty(_enteredTag))
+        if (string.IsNullOrEmpty(EnteredTag))
         {
             sb.Append("Task is empty.");
             sb.Append(Environment.NewLine);
