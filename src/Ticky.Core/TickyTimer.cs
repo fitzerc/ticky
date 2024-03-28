@@ -8,13 +8,13 @@ public class TickyTimer
     private Stopwatch? _activeStopwatch;
     private Timer? _activeTimer;
 
-    private Action<TimeSpan?>? _activeOnTick;
+    private Action<TimeSpan>? _activeOnTick;
     private TimeSpan? _activeDelay;
     private TimeSpan? _activePeriod;
 
     public bool IsRunning() => _activeTimer is not null;
 
-    public Result Start(Action<TimeSpan?> onTick, TimeSpan? delay = null, TimeSpan? period = null)
+    public Result Start(Action<TimeSpan> onTick, TimeSpan? delay = null, TimeSpan? period = null)
     {
         try
         {
@@ -30,7 +30,7 @@ public class TickyTimer
         }
     }
 
-    private Result StartTimer(TimeSpan? delay, TimeSpan? period, Action<TimeSpan?> onTick)
+    private Result StartTimer(TimeSpan? delay, TimeSpan? period, Action<TimeSpan> onTick)
     {
         if (_activeStopwatch is null)
         {
@@ -106,14 +106,21 @@ public class TickyTimer
         }
     }
 
-    public Result Stop()
+    public Result<TimeSpan> Stop()
     {
         try
         {
+            if (_activeStopwatch is null)
+            {
+                return Result.Fail(ErrorStrings.NullStopwatchOnStop);
+            }
+
+            var elapsed = _activeStopwatch.Elapsed;
+
             ClearStopwatch();
             ClearTimer();
 
-            return Result.Ok();
+            return Result.Ok(elapsed);
         }
         catch (Exception e)
         {
@@ -139,10 +146,13 @@ public class TickyTimer
 
     public static class ErrorStrings
     {
+#pragma warning disable CA2211
         public static string NullStopwatchOnStart = "cannot start timer when active stopwatch is null";
         public static string NullStopwatchOnPause = "cannot pause when active stopwatch is null";
         public static string NullStopwatchOnUnpause = "cannot unpause when active stopwatch is null";
         public static string NullOnTickOnUnpause = "cannot unpause when active onTick is null";
+        public static string NullStopwatchOnStop = "cannot stop when active stopwatch is null";
+#pragma warning restore CA2211
     }
 }
 

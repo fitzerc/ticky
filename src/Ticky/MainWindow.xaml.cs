@@ -1,18 +1,16 @@
 ﻿using System.Windows;
+using Ticky.DataAccess;
 
-namespace Ticky
+namespace Ticky;
+
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        private readonly MainWindowViewModel _viewModel;
-        public MainWindow()
-        {
-            InitializeComponent();
-            _viewModel = new MainWindowViewModel();
-            DataContext = _viewModel;
-        }
+        InitializeComponent();
+
+        //TODO: move to DI container
+        var viewModel = new MainWindowViewModel(new FileDataWriter());
+        DataContext = viewModel;
     }
 }

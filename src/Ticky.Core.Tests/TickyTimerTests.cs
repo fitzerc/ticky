@@ -111,7 +111,7 @@ public class TickyTimerTests
         var pauseTimerResult = sut.Pause();
 
         pauseTimerResult.IsFailed.Should().BeTrue();
-        pauseTimerResult.Errors.Any().Should().BeTrue();
+        pauseTimerResult.Errors.Count.Should().NotBe(0);
         pauseTimerResult.Errors.FirstOrDefault()?.Message.Should().Be(TickyTimer.ErrorStrings.NullStopwatchOnPause);
 
         sut.Stop();
@@ -124,7 +124,7 @@ public class TickyTimerTests
         var unpauseTimerResult = sut.Unpause();
 
         unpauseTimerResult.IsFailed.Should().BeTrue();
-        unpauseTimerResult.Errors.Any().Should().BeTrue();
+        unpauseTimerResult.Errors.Count.Should().NotBe(0);
         unpauseTimerResult.Errors.FirstOrDefault()?.Message.Should().Be(TickyTimer.ErrorStrings.NullStopwatchOnUnpause);
 
         sut.Stop();

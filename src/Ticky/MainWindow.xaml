@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ticky"
         mc:Ignorable="d"
-        Title="MainWindow" Height="105" Width="400">
+        Title="MainWindow" Height="125" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"></RowDefinition>
@@ -24,6 +24,15 @@
             <Button Grid.Column="2" Command="{Binding PauseCommand}" Content="Pause"></Button>
             <Button Grid.Column="3" Command="{Binding StopCommand}" Content="Stop"></Button>
         </Grid>
-        <TextBlock Grid.Row="1" Text="{Binding FooterText}"></TextBlock>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding EnteredProject}"></TextBox>
+            <TextBox Grid.Column="1" Text="{Binding EnteredTask}"></TextBox>
+            <TextBox Grid.Column="2" Text="{Binding EnteredTag}"></TextBox>
+        </Grid>
     </Grid>
 </Window>

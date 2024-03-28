@@ -1,85 +1,168 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Text;
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Ticky.Core;
+using Ticky.Core.Data;
 
 namespace Ticky;
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : ObservableObject
 {
+    private bool CanExecuteStart() => _timer is null || !_timer.IsRunning();
+    private bool CanExecutePause() => _timer is not null && _timer.IsRunning();
+    private bool CanExecuteStop() => _timer is not null;
+
+    [ObservableProperty] private string _enteredProject = "Project";
+    [ObservableProperty] private string _enteredTask = "Task";
+    [ObservableProperty] private string _enteredTag = "Tag";
+
     private TickyTimer? _timer;
 
     public string FooterText { get; private set; } = "Placeholder Text";
-
     private string _time = "00:00:00";
+
     public string Time
     {
         get => _time;
         set => SetProperty(ref _time, value);
     }
 
-    [RelayCommand]
+    //TODO: move this to a setter so it happens when it needs to?
+    private void NotifyExecuteChanged()
+    {
+        StartCommand.NotifyCanExecuteChanged();
+        PauseCommand.NotifyCanExecuteChanged();
+        StopCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteStart))]
     private void Start()
     {
-        if (_timer is null)
+        switch (_timer)
         {
-            TickyTimerSettings.Period = TimeSpan.FromSeconds(5);
-            _timer = new TickyTimer();
+            case null:
+                _timer = new TickyTimer();
+                _ = _timer.Start(OnTick);
+                break;
+            case var t when !t.IsRunning():
+                _ = _timer.Unpause();
+                break;
+        }
 
-            var startResult = _timer.Start(OnTick);
-            if (startResult.IsFailed)
-            {
-                //TODO: handle TimerStart error
-            }
-        }
-        else if (!_timer.IsRunning())
-        {
-            var unpauseResult = _timer.Unpause();
-            if (unpauseResult.IsFailed)
-            {
-                //TODO: handle TimerUnpause error
-            }
-        }
+        NotifyExecuteChanged();
     }
 
-    private void OnTick(TimeSpan? ts)
-    {
-        if (ts.HasValue)
-        {
-            Time = $"{ts.Value.Hours:00}:{ts.Value.Minutes:00}:{ts.Value.Seconds:00}";
-        }
-    }
+    private void OnTick(TimeSpan ts) => Time = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecutePause))]
     private void Pause()
     {
-        if (_timer is null)
+        _ = _timer?.Pause();
+        NotifyExecuteChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteStop))]
+    private async Task Stop()
+    {
+        //Pause in case we need to wait for user input
+        _ = _timer?.Pause();
+        NotifyExecuteChanged();
+
+        var inputValidated = ValidateInput();
+
+        if (!inputValidated)
         {
-            //TODO: handle pause _timer is null error
             return;
         }
 
-        var timerPauseResult = _timer.Pause();
-        if (timerPauseResult.IsFailed)
+        var stopTimerResult = _timer?.Stop();
+        NotifyExecuteChanged();
+
+        switch (stopTimerResult)
         {
-            //TODO: handle TimerPause error
+            case null:
+                //TODO: handle StopTimer error
+                break;
+            case not null:
+                _timer = null;
+
+                var te = new TimeEntry(
+                    EnteredProject,
+                    EnteredTask,
+                    EnteredTag,
+                    stopTimerResult.Value);
+
+                await CommitEntryAsync(te);
+
+                EnteredProject = "Project";
+                EnteredTask = "Task";
+                EnteredTag = "Tag";
+
+                break;
         }
     }
 
-    [RelayCommand]
-    private void Stop()
+    private bool ValidateInput()
     {
-        if (_timer is null)
+        var sb = new StringBuilder();
+
+        if (_enteredProject == "Project" || _enteredTask == "Task" || _enteredTag == "Tag")
         {
-            //TODO: handle stop _timer is null error
-            return;
+            sb.Append("Project, task, or tag are default values.");
+            sb.Append(Environment.NewLine);
         }
 
-        var stopTimerResult = _timer.Stop();
-        if (stopTimerResult.IsFailed)
+        if (string.IsNullOrEmpty(_enteredProject))
         {
-            //TODO: handle StopTimer error
+            sb.Append("Project is empty.");
+            sb.Append(Environment.NewLine);
         }
 
-        _timer = null;
+        if (string.IsNullOrEmpty(_enteredTask))
+        {
+            sb.Append("Task is empty.");
+            sb.Append(Environment.NewLine);
+        }
+
+        if (string.IsNullOrEmpty(_enteredTag))
+        {
+            sb.Append("Task is empty.");
+            sb.Append(Environment.NewLine);
+        }
+
+        var validationError = sb.ToString();
+
+        if (!string.IsNullOrEmpty(validationError))
+        {
+            var result = MessageBox.Show(
+                validationError + "Do you want to save time entry as is?", // The text to display
+                "Confirmation", // The title of the message box
+                MessageBoxButton.YesNo, // The buttons to show
+                MessageBoxImage.Question); // The icon to show
+
+            if (result == MessageBoxResult.Yes)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private async Task CommitEntryAsync(TimeEntry te)
+    {
+        try
+        {
+            await dataWriter.WriteTimeEntryAsync(te);
+        }
+        catch
+        {
+            //TODO: handle error
+        }
     }
 }
