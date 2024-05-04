@@ -8,6 +8,8 @@ namespace Ticky.DataAccess;
 public class FileDataWriter : ITickyDataWriter
 {
     private readonly string _appDataFolder;
+    //TODO: move version into AppSettings? maybe the version can go away later
+    private const string OutputFileVersion = "2";
 
     public FileDataWriter()
     {
@@ -24,7 +26,7 @@ public class FileDataWriter : ITickyDataWriter
                 Directory.CreateDirectory(_appDataFolder);
             }
 
-            var filePath = $"{_appDataFolder}/ticky-{DateTime.Now:yyyy-MM-dd}.csv";
+            var filePath = $"{_appDataFolder}/ticky-v{OutputFileVersion}-{DateTime.Now:yyyy-MM-dd}.csv";
 
             if (!File.Exists(filePath))
             {

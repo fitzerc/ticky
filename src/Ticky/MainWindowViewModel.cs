@@ -7,20 +7,47 @@ using Ticky.Core.Data;
 
 namespace Ticky;
 
-public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : ObservableObject
+public partial class MainWindowViewModel : ObservableObject
 {
     private bool CanExecuteStart() => _timer is null || !_timer.IsRunning();
-    private bool CanExecutePause() => _timer is not null && _timer.IsRunning();
+    private bool CanExecutePause()
+    {
+        var shouldEnablePause = _timer is not null && !IsDefaultEntryValues() && _timer.IsRunning();
+
+        PauseToolTipVisibility = shouldEnablePause ? Visibility.Hidden : Visibility.Visible;
+
+        return shouldEnablePause;
+    }
+
     private bool CanExecuteStop() => _timer is not null;
 
     [ObservableProperty] private string _enteredProject = "Project";
     [ObservableProperty] private string _enteredTask = "Task";
     [ObservableProperty] private string _enteredTag = "Tag";
+    [ObservableProperty] private Visibility _pauseToolTipVisibility = Visibility.Visible;
 
     private TickyTimer? _timer;
 
     public string FooterText { get; private set; } = "Placeholder Text";
     private string _time = "00:00:00";
+    private readonly ITickyDataWriter _dataWriter;
+
+    /// <inheritdoc/>
+    public MainWindowViewModel(ITickyDataWriter dataWriter)
+    {
+        _dataWriter = dataWriter;
+        PropertyChanged += (_, args) =>
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(EnteredProject):
+                case nameof(EnteredTask):
+                case nameof(EnteredTag):
+                    NotifyExecuteChanged();
+                    break;
+            }
+        };
+    }
 
     public string Time
     {
@@ -28,7 +55,7 @@ public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : Observab
         set => SetProperty(ref _time, value);
     }
 
-    //TODO: move this to a setter so it happens when it needs to?
+    //TODO: move this to a setter, so it happens when it needs to?
     private void NotifyExecuteChanged()
     {
         StartCommand.NotifyCanExecuteChanged();
@@ -56,14 +83,18 @@ public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : Observab
     private void OnTick(TimeSpan ts) => Time = $"{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}";
 
     [RelayCommand(CanExecute = nameof(CanExecutePause))]
-    private void Pause()
+    private async Task Pause()
     {
-        _ = _timer?.Pause();
-        NotifyExecuteChanged();
+        await StopAndWriteAsync(false);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteStop))]
     private async Task Stop()
+    {
+        await StopAndWriteAsync();
+    }
+
+    private async Task StopAndWriteAsync(bool resetEntryDetails = true)
     {
         //Pause in case we need to wait for user input
         _ = _timer?.Pause();
@@ -95,19 +126,27 @@ public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : Observab
 
                 await CommitEntryAsync(te);
 
-                EnteredProject = "Project";
-                EnteredTask = "Task";
-                EnteredTag = "Tag";
+                if (resetEntryDetails)
+                {
+                    EnteredProject = "Project";
+                    EnteredTask = "Task";
+                    EnteredTag = "Tag";
+                }
 
                 break;
         }
+    }
+
+    private bool IsDefaultEntryValues()
+    {
+        return EnteredProject == "Project" || EnteredTask == "Task" || EnteredTag == "Tag";
     }
 
     private bool ValidateInput()
     {
         var sb = new StringBuilder();
 
-        if (EnteredProject == "Project" || EnteredTask == "Task" || EnteredTag == "Tag")
+        if (IsDefaultEntryValues())
         {
             sb.Append("Project, task, or tag are default values.");
             sb.Append(Environment.NewLine);
@@ -158,7 +197,7 @@ public partial class MainWindowViewModel(ITickyDataWriter dataWriter) : Observab
     {
         try
         {
-            await dataWriter.WriteTimeEntryAsync(te);
+            await _dataWriter.WriteTimeEntryAsync(te);
         }
         catch
         {
