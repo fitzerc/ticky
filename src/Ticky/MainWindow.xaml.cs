@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using Ticky.DataAccess;
 
 namespace Ticky;
@@ -13,4 +14,6 @@ public partial class MainWindow : Window
         var viewModel = new MainWindowViewModel(new FileDataWriter());
         DataContext = viewModel;
     }
+
+    private void TextBoxKeyboardFocusChanged(object sender, RoutedEventArgs e) => ((TextBox)sender).SelectAll();
 }

@@ -76,11 +76,11 @@ public class TimeEntry(
             .Append(comma)
             .Append(nameof(Tag))
             .Append(comma)
-            .Append(nameof(Elapsed) + " (seconds)")
-            .Append(comma)
             .Append(nameof(StartTime))
             .Append(comma)
-            .Append(nameof(EndTime));
+            .Append(nameof(EndTime))
+            .Append(comma)
+            .Append(nameof(Elapsed));
 
         return sb.ToString();
     }
@@ -98,11 +98,11 @@ public static class TimeEntryExtensions
             .Append(comma)
             .Append(te.Tag)
             .Append(comma)
-            .Append(te.Elapsed.Seconds)
-            .Append(comma)
             .Append(te.StartTime.ToString(dateFormat))
             .Append(comma)
-            .Append(te.EndTime.ToString(dateFormat));
+            .Append(te.EndTime.ToString(dateFormat))
+            .Append(comma)
+            .Append(te.Elapsed.ToString(@"hh\:mm\:ss\.fff"));
 
         return sb.ToString();
     }
