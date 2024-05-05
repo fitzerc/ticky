@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -39,6 +40,9 @@
             <TextBox GotKeyboardFocus="TextBoxKeyboardFocusChanged" Grid.Column="0" Text="{Binding EnteredProject}"></TextBox>
             <TextBox GotKeyboardFocus="TextBoxKeyboardFocusChanged" Grid.Column="1" Text="{Binding EnteredTask}"></TextBox>
             <TextBox GotKeyboardFocus="TextBoxKeyboardFocusChanged" Grid.Column="2" Text="{Binding EnteredTag}"></TextBox>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Button Command="{Binding ConvertV1ToV2Command}" Content="Convert Saved Files"></Button>
         </Grid>
     </Grid>
 </Window>

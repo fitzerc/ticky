@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Ticky.Conversion;
 using Ticky.DataAccess;
 
 namespace Ticky;
@@ -11,7 +12,8 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         //TODO: move to DI container
-        var viewModel = new MainWindowViewModel(new FileDataWriter());
+        var dataWriter = new FileDataWriter();
+        var viewModel = new MainWindowViewModel(dataWriter, new VersionConverter(dataWriter));
         DataContext = viewModel;
     }
 

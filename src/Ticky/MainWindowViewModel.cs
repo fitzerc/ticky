@@ -2,6 +2,7 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Ticky.Conversion;
 using Ticky.Core;
 using Ticky.Core.Data;
 
@@ -31,11 +32,13 @@ public partial class MainWindowViewModel : ObservableObject
     public string FooterText { get; private set; } = "Placeholder Text";
     private string _time = "00:00:00";
     private readonly ITickyDataWriter _dataWriter;
+    private readonly IVersionConverter _versionConverter;
 
     /// <inheritdoc/>
-    public MainWindowViewModel(ITickyDataWriter dataWriter)
+    public MainWindowViewModel(ITickyDataWriter dataWriter, IVersionConverter versionConverter)
     {
         _dataWriter = dataWriter;
+        _versionConverter = versionConverter;
         PropertyChanged += (_, args) =>
         {
             switch (args.PropertyName)
@@ -61,6 +64,12 @@ public partial class MainWindowViewModel : ObservableObject
         StartCommand.NotifyCanExecuteChanged();
         PauseCommand.NotifyCanExecuteChanged();
         StopCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand]
+    private async Task ConvertV1ToV2()
+    {
+        await _versionConverter.Version1ToVersion2();
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteStart))]
