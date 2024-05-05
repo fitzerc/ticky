@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using FluentResults;
 using Ticky.Core;
 using Ticky.Core.Data;
@@ -17,7 +18,7 @@ public class FileDataWriter : ITickyDataWriter
         _appDataFolder = Path.Combine(localAppData, nameof(Ticky));
     }
 
-    public async Task<Result> WriteTimeEntryAsync(TimeEntry entry)
+    public async Task<Result> WriteTimeEntryAsync(TimeEntry entry, DateTime? overrideFileDateWith = null)
     {
         try
         {
@@ -26,7 +27,11 @@ public class FileDataWriter : ITickyDataWriter
                 Directory.CreateDirectory(_appDataFolder);
             }
 
-            var filePath = $"{_appDataFolder}/ticky-v{OutputFileVersion}-{DateTime.Now:yyyy-MM-dd}.csv";
+            var dateString = overrideFileDateWith is null
+                ? DateTime.Now.ToString("yyyy-MM-dd")
+                : overrideFileDateWith.Value.ToString("yyyy-MM-dd");
+
+            var filePath = $"{_appDataFolder}/ticky-v{OutputFileVersion}-{dateString}.csv";
 
             if (!File.Exists(filePath))
             {
