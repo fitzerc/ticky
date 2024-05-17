@@ -42,7 +42,7 @@
             <TextBox GotKeyboardFocus="TextBoxKeyboardFocusChanged" Grid.Column="2" Text="{Binding EnteredTag}"></TextBox>
         </Grid>
         <Grid Grid.Row="2">
-            <Button Command="{Binding ConvertV1ToV2Command}" Content="Convert Saved Files"></Button>
+            <Button Command="{Binding ConsolidateExistingFilesCommand}" Content="Convert Saved Files"></Button>
         </Grid>
     </Grid>
 </Window>

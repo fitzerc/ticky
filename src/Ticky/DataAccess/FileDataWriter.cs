@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 using FluentResults;
 using Ticky.Core;
 using Ticky.Core.Data;
@@ -46,5 +46,28 @@ public class FileDataWriter : ITickyDataWriter
         {
             return Result.Fail(new ExceptionalError(e));
         }
+    }
+
+    public async Task<Result> ConsolidateFilesAsync()
+    {
+        string outputFile = @$"{_appDataFolder}\Consolidated-{DateTime.Now:yyyy-MM-dd}.csv"; // Replace with your desired output file path
+
+        StringBuilder consolidatedContent = new StringBuilder();
+
+        foreach (string file in Directory.GetFiles(_appDataFolder, "*.csv"))
+        {
+            string[] lines = File.ReadAllLines(file);
+            foreach (string line in lines.Skip(1))
+            {
+                if (!string.IsNullOrWhiteSpace(line)) // Ignore empty lines
+                {
+                    consolidatedContent.AppendLine(line);
+                }
+            }
+        }
+
+        await File.WriteAllTextAsync(outputFile, consolidatedContent.ToString());
+
+        return Result.Ok();
     }
 }
