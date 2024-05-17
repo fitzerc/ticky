@@ -102,7 +102,7 @@ public static class TimeEntryExtensions
             .Append(comma)
             .Append(te.EndTime.ToString(dateFormat))
             .Append(comma)
-            .Append(te.Elapsed.ToString(@"hh\:mm\:ss\.fff"));
+            .Append(te.Elapsed.ToString(@"hh\:mm\:ss"));
 
         return sb.ToString();
     }

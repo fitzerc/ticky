@@ -13,7 +13,7 @@ public partial class MainWindow : Window
 
         //TODO: move to DI container
         var dataWriter = new FileDataWriter();
-        var viewModel = new MainWindowViewModel(dataWriter, new VersionConverter(dataWriter));
+        var viewModel = new MainWindowViewModel(dataWriter);
         DataContext = viewModel;
     }
 

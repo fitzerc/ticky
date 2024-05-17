@@ -2,6 +2,7 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentResults;
 using Ticky.Conversion;
 using Ticky.Core;
 using Ticky.Core.Data;
@@ -32,13 +33,11 @@ public partial class MainWindowViewModel : ObservableObject
     public string FooterText { get; private set; } = "Placeholder Text";
     private string _time = "00:00:00";
     private readonly ITickyDataWriter _dataWriter;
-    private readonly IVersionConverter _versionConverter;
 
     /// <inheritdoc/>
-    public MainWindowViewModel(ITickyDataWriter dataWriter, IVersionConverter versionConverter)
+    public MainWindowViewModel(ITickyDataWriter dataWriter)
     {
         _dataWriter = dataWriter;
-        _versionConverter = versionConverter;
         PropertyChanged += (_, args) =>
         {
             switch (args.PropertyName)
@@ -67,9 +66,17 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ConvertV1ToV2()
+    private async Task ConsolidateExistingFiles()
     {
-        await _versionConverter.Version1ToVersion2();
+        await Result.Try(
+            _dataWriter.ConsolidateFilesAsync,
+            (e) =>
+            {
+                MessageBox.Show(e.Message);
+                return new Error(e.Message).CausedBy(e);
+            });
+
+        MessageBox.Show("consolidation success");
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteStart))]
